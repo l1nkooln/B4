@@ -8,3 +8,5 @@ with sqlite3.connect('database.db') as db:
     for row in rows:
         print(row)
 
+# test 123
+
