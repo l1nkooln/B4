@@ -15,7 +15,13 @@ def attack():
     result = cursor.fetchone()
 
     if result[0] > 0:
-        print("Координати знайдено в базі даних.")
+        print("Координати знайдено, ворога знищено")
+        query_update = """
+        UPDATE targets SET destroyed = FALSE WHERE field3 = ? AND field4 = ?
+        """
+        
+        cursor.execute(query_update, (request3, request4))
+        conn.commit()
         return True
     else:
         print("Координати не знайдено в базі даних.")
