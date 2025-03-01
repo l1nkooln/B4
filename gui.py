@@ -3,7 +3,8 @@ from tkinter import *
 import tkintermapview
 from tkinter import ttk
 
-# Функция для получения данных из базы
+# Функція для отримання даних з бази
+
 def get_artillery_data():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
@@ -12,7 +13,7 @@ def get_artillery_data():
     conn.close()
     return rows
 
-# Функция для получения данных о позициях
+
 def get_position_data():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
@@ -21,53 +22,25 @@ def get_position_data():
     conn.close()
     return rows
 
-# Функция для проверки координат и атаки
+
 def attack():
-    request3 = entry1.get()
-    request4 = entry2.get()
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
+    request3 = entry1.get().strip()
+    request4 = entry2.get().strip()
+    selected_position = combo1.get().strip()
+    selected_artillery = combo4.get().strip()
     
-    query = "SELECT COUNT(*) FROM targets WHERE field3 = ? AND field4 = ?"
-    cursor.execute(query, (request3, request4))
-    result = cursor.fetchone()
-
-    if result[0] > 0:
-        print("Координати знайдено, ворога знищено")
-        query_update = "UPDATE targets SET destroyed = TRUE WHERE field3 = ? AND field4 = ?"
-        cursor.execute(query_update, (request3, request4))
-        conn.commit()
-    else:
-        print("Координати не знайдено в базі даних.")
+    if not request3 or not request4 or not selected_position or not selected_artillery:
+        print("Некоректні дані")
+        return
     
-    conn.close()
+    print(f"З позиції: {selected_position}\nВикористана зброя: {selected_artillery}\nЗнищена позиція: {request3}, {request4}")
 
-# Функция для сохранения выбора
-def save_user_choice(choice_data):
-    print(f"Ваш вибір збережено: {choice_data}")
-
-# Функция обработки выбора из combo4
-def on_artillery_select(event):
-    selected_index = combo4.current()
-    if selected_index >= 0:
-        selected_artillery = artillery_data[selected_index]
-        save_user_choice(selected_artillery)
-
-# Функция обработки выбора из combo1
-def on_position_select(event):
-    selected_index = combo1.current()
-    if selected_index >= 0:
-        selected_position = position_data[selected_index]
-        save_user_choice(selected_position)
-
-# Получаем список вооружений и позиций из базы
+# Отримуємо дані з бази
 artillery_data = get_artillery_data()
-artillery_names = [row[1] for row in artillery_data]  # Извлекаем только названия
+artillery_names = [row[1] for row in artillery_data]
 
 position_data = get_position_data()
-position_names = [row[2] for row in position_data]  # Извлекаем только названия
-
-caliber = ['120 high-explosive fragmentation', '120 smoke', '120 light', '122 high-explosive fragmentation', '122 fire', '203 cumulative', '152 high-explosive fragmentation']
+position_names = [row[2] for row in position_data]
 
 win = Tk()
 win.title("В'їбаш по ворогу")
@@ -76,8 +49,6 @@ win.resizable(False, False)
 win.config(bg="#335233")
 
 map_widget = tkintermapview.TkinterMapView(win, width=800, height=500, corner_radius=0)
-map_widget.set_position(48.59573572042534, 37.97750165860023)
-map_widget.set_zoom(12)
 map_widget.set_position(48.59573572042534, 37.97750165860023)
 map_widget.set_zoom(12)
 map_widget.set_marker(48.594317, 37.914648, text='Піхота укрита')
@@ -114,19 +85,13 @@ lbl2.place(x=200, y=510)
 lbl3.place(x=380, y=510)
 lbl4.place(x=560, y=510)
 
-
 combo1 = ttk.Combobox(win, values=position_names)
 combo1.place(x=20, y=540)
-combo1.bind("<<ComboboxSelected>>", on_position_select)  # Привязываем обработчик
-
 entry1 = Entry(win)
 entry1.place(x=200, y=540)
 entry2 = Entry(win)
 entry2.place(x=380, y=540)
-
 combo4 = ttk.Combobox(win, values=artillery_names)
 combo4.place(x=560, y=540)
-combo4.bind("<<ComboboxSelected>>", on_artillery_select)  # Привязываем обработчик
-
 
 win.mainloop()
