@@ -1,9 +1,33 @@
+import sqlite3
 from tkinter import *
 import tkintermapview
 from tkinter import ttk
 
+# Функция для получения данных из базы
+def get_artillery_data():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM artillery")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+# Функция для сохранения выбора
+def save_user_choice(choice_data):
+    print(f"Ваш вибір збережено: {choice_data}")
+
+# Функция обработки выбора из combo4
+def on_artillery_select(event):
+    selected_index = combo4.current()
+    if selected_index >= 0:
+        selected_artillery = artillery_data[selected_index]
+        save_user_choice(selected_artillery)
+
+# Получаем список вооружений из базы
+artillery_data = get_artillery_data()
+artillery_names = [row[1] for row in artillery_data]  # Извлекаем только названия
+
 position = ['Туча', 'Сокіл', 'Заєць']
-gun = ['Гвоздика', 'Акація', 'Піон', '122-мм', '120-мм']
 caliber = ['120 high-explosive fragmentation', '120 smoke', '120 light', '122 high-explosive fragmentation', '122 fire', '203 cumulative', '152 high-explosive fragmentation']
 
 win = Tk()
@@ -35,6 +59,7 @@ map_widget.set_marker(48.588868, 38.00686, text='логістичний цент
 map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів')
 map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів')
 map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів')
+map_widget.place(x=0, y=0)
 
 bt = Button(text="В'їбати", height=5, width=20, font=("Arial", 10, "bold"))
 bt.place(x=817, y=50)
@@ -50,20 +75,16 @@ lbl3.place(x=380, y=510)
 lbl4.place(x=560, y=510)
 lbl5.place(x=740, y=510)
 
-
 combo1 = ttk.Combobox(win, values=position)
 combo1.place(x=20, y=540)
 combo2 = ttk.Combobox(win, values=["Енеїда", "Тарас Бульба", "Гайдамаки", "Собор"])
 combo2.place(x=200, y=540)
 combo3 = ttk.Combobox(win, values=["Енеїда", "Тарас Бульба", "Гайдамаки", "Собор"])
 combo3.place(x=380, y=540)
-combo4 = ttk.Combobox(win, values=gun)
+combo4 = ttk.Combobox(win, values=artillery_names)
 combo4.place(x=560, y=540)
+combo4.bind("<<ComboboxSelected>>", on_artillery_select)  # Привязываем обработчик
 combo5 = ttk.Combobox(win, values=caliber)
 combo5.place(x=740, y=540)
 
-
-map_widget.place(x=0, y=0)
-
 win.mainloop()
-
