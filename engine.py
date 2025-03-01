@@ -43,14 +43,14 @@ def get_artillery_data():
     # Виводимо отримані дані
     print("Виберіть опцію з наведеного списку:")
     for index, row in enumerate(rows):
-        print(f"{index + 1}. {row}")  # Виводимо дані, заміни row на потрібний формат
+        print(f"{index + 1}. {row[1]}")  # Виводимо дані, заміни row на потрібний формат
 
     # Запитуємо в користувача вибір
     try:
         choice = int(input("Введіть номер вибору: ")) - 1
         if 0 <= choice < len(rows):
             selected_data = rows[choice]
-            print(f"Ви вибрали: {selected_data}")
+            print(f"Ви вибрали: {selected_data[1]}")
             save_user_choice(selected_data)
         else:
             print("Невірний вибір.")
@@ -62,12 +62,7 @@ def get_artillery_data():
 
 #збереження вибору арт обстановки
 def save_user_choice(choice_data):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
     print("Ваш вибір збережено.")
-    
-    conn.close()
 
 
 get_artillery_data()
-
