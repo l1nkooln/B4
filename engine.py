@@ -1,5 +1,6 @@
 import sqlite3
 
+#постріл
 def attack():
     request1 = input('Введіть чим вєбати (номер):')
     request2 = input('Введіть снаряд яким вєбати:')
@@ -17,7 +18,7 @@ def attack():
     if result[0] > 0:
         print("Координати знайдено, ворога знищено")
         query_update = """
-        UPDATE targets SET destroyed = FALSE WHERE field3 = ? AND field4 = ?
+        UPDATE targets SET destroyed = TRUE WHERE field3 = ? AND field4 = ?
         """
         
         cursor.execute(query_update, (request3, request4))
@@ -29,5 +30,44 @@ def attack():
 
     conn.close()
 
-attack()
+
+#вибір артилерії
+def get_artillery_data():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    # Запитуємо дані з таблиці artillery
+    cursor.execute("SELECT * FROM artillery") 
+    rows = cursor.fetchall()
+
+    # Виводимо отримані дані
+    print("Виберіть опцію з наведеного списку:")
+    for index, row in enumerate(rows):
+        print(f"{index + 1}. {row}")  # Виводимо дані, заміни row на потрібний формат
+
+    # Запитуємо в користувача вибір
+    try:
+        choice = int(input("Введіть номер вибору: ")) - 1
+        if 0 <= choice < len(rows):
+            selected_data = rows[choice]
+            print(f"Ви вибрали: {selected_data}")
+            save_user_choice(selected_data)
+        else:
+            print("Невірний вибір.")
+    except ValueError:
+        print("Будь ласка, введіть коректний номер.")
+    
+    conn.close()
+
+
+#збереження вибору арт обстановки
+def save_user_choice(choice_data):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    print("Ваш вибір збережено.")
+    
+    conn.close()
+
+
+get_artillery_data()
 
