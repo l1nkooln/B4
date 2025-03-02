@@ -63,7 +63,6 @@ def attack():
 
 # кординати на мапі вибір
 def on_map_click(event):
-
     # Отримати координати, куди було натиснуто
     lat, lon = map_widget.get_coordinates_from_event(event)
     
@@ -74,15 +73,62 @@ def on_map_click(event):
     entry2.insert(0, lon)
 
 
+# Оновлюємо комбобокс калібрів при виборі артилерії
+def update_caliber(event):
+    selected_artillery = combo4.get()
+    calibers = get_calibers_for_artillery(selected_artillery)
+    
+    # Очищаємо і оновлюємо комбобокс калібрів
+    combo_caliber.set('')
+    combo_caliber['values'] = calibers
+    if calibers:
+        combo_caliber.current(0)  # Встановлюємо перший доступний калібр як вибраний
+
+
+# Функція для отримання калібрів для вибраної артилерії
+def get_calibers_for_artillery(artillery_name):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT ammo FROM artillery WHERE name = ?", (artillery_name,))
+    calibers = cursor.fetchone()
+    conn.close()
+    
+    if calibers:
+        return get_field1_from_caliber(calibers[0])  # Викликаємо функцію для отримання значень з таблиці за калібром
+    return []
+
+
+# Функція для перевірки, чи існує таблиця в базі
+def table_exists(table_name):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
+
+
+# Функція для отримання значень поля field1 з таблиці, що називається калібром
+def get_field1_from_caliber(caliber):
+    if not table_exists(caliber):  # Перевіряємо, чи існує таблиця
+        print(f"Таблиця для калібру '{caliber}' не знайдена в базі даних.")
+        return []
+    
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT field1 FROM '{caliber}'")  # Виконуємо запит до таблиці, ім'я якої - калібр
+    field1_values = cursor.fetchall()
+    conn.close()
+    
+    # Повертаємо список значень field1
+    return [field1[0] for field1 in field1_values]
+
 
 artillery_data = get_artillery_data()
 artillery_names = [row[1] for row in artillery_data]
 
-
-
 position_data = get_position_data()
 position_names = [row[2] for row in position_data]
-
 
 win = Tk()
 win.title("Військова Операція")
@@ -93,7 +139,6 @@ height= win.winfo_screenheight()
 win.geometry("%dx%d" % (width, height))
 win.resizable(True, True)
 win.config(bg="#2F4F2F")  
-
 
 map_widget = tkintermapview.TkinterMapView(win, width=1920, height=580, corner_radius=0)
 map_widget.set_position(48.59573572042534, 37.97750165860023)
@@ -138,17 +183,18 @@ lbl3.place(x=540, y=640)
 lbl4.place(x=800, y=640)
 lbl5.place(x=1060, y=640)
 
-
 combo1 = ttk.Combobox(win, values=position_names, font=("Arial", 10))
 combo1.place(x=20, y=680)
 entry1 = Entry(win, font=("Arial", 10))
 entry1.place(x=280, y=680)
 entry2 = Entry(win, font=("Arial", 10))
 entry2.place(x=540, y=680)
+
 combo4 = ttk.Combobox(win, values=artillery_names, font=("Arial", 10))
 combo4.place(x=800, y=680)
-combo4 = ttk.Combobox(win, values=artillery_names, font=("Arial", 10))
-combo4.place(x=1060, y=680)
+combo4.bind("<<ComboboxSelected>>", update_caliber)
 
+combo_caliber = ttk.Combobox(win, font=("Arial", 10))
+combo_caliber.place(x=1060, y=680)
 
 win.mainloop()
