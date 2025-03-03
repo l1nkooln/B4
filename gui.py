@@ -3,198 +3,140 @@ from tkinter import *
 import tkintermapview
 from tkinter import ttk
 
-# витяг з бд артилерій 
-def get_artillery_data():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM artillery")
-    rows = cursor.fetchall()
-    conn.close()
-    return rows
 
-# витягує з бд наші позиції
-def get_position_data():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM units")
-    rows = cursor.fetchall()
-    conn.close()
-    return rows
+class DatabaseManager:
+    def __init__(self, db_name='database.db'):
+        self.db_name = db_name
 
-# удар
-def attack():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    request3 = entry1.get().strip()
-    request4 = entry2.get().strip()
-    selected_position = combo1.get().strip()
-    selected_artillery = combo4.get().strip()
-    
-    if not request3 or not request4 or not selected_position or not selected_artillery:
-        print("Некоректні дані")
-        return
-    
-    query = """
-    SELECT COUNT(*) FROM targets WHERE field3 = ? AND field4 = ?
-    """
-    cursor.execute(query, (request3, request4))
-    result = cursor.fetchone()
-
-    if result[0] > 0:
-        print("Координати знайдено, ворога знищено")
-        query_update = """
-        UPDATE targets SET destroyed = TRUE WHERE field3 = ? AND field4 = ?
-        """
-        
-        cursor.execute(query_update, (request3, request4))
+    def execute_query(self, query, params=()):
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        cursor.execute(query, params)
         conn.commit()
-        entry1.delete(0, END)
-        entry2.delete(0, END)
-        return True
-    else:
-        print("Координати не знайдено в базі даних.")
-        entry1.delete(0, END)
-        entry2.delete(0, END)
-        return False
+        conn.close()
+
+    def fetch_all(self, query, params=()):
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+
+    def table_exists(self, table_name):
+        query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
+        return bool(self.fetch_all(query, (table_name,)))
+
+class MilitaryApp:
+    def __init__(self, root):
+        self.db = DatabaseManager()
+        self.root = root
+        self.root.title("Військова Операція")
+        self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}")
+        self.root.config(bg="#2F4F2F")
+        
+        self.artillery_data = self.db.fetch_all("SELECT * FROM artillery")
+        self.position_data = self.db.fetch_all("SELECT * FROM units")
+        
+        self.artillery_names = [row[1] for row in self.artillery_data]
+        self.position_names = [row[2] for row in self.position_data]
+        
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.map_widget = tkintermapview.TkinterMapView(self.root, width=1920, height=580, corner_radius=0)
+        self.map_widget.set_position(48.5957, 37.9775)
+        self.map_widget.set_zoom(12)
+        self.map_widget.set_marker(48.594317, 37.914648, text='Піхота укрита')
+        self.map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита')
+        self.map_widget.set_marker(48.594317, 37.914648, text='Піхота')
+        self.map_widget.set_marker(48.568261, 37.88323, text='Піхота укрита')
+        self.map_widget.set_marker(48.580133, 37.897703, text='Піхота укрита')
+        self.map_widget.set_marker(48.532218, 37.900205, text='Піхота укрита')
+        self.map_widget.set_marker(48.557198, 37.903422, text='Піхота укрита')
+        self.map_widget.set_marker(48.588623, 37.966295, text='ксп укрите')
+        self.map_widget.set_marker(48.576391, 37.909502, text='міномет укритий')
+        self.map_widget.set_marker(48.565392, 37.915432, text='міномет укритий')
+        self.map_widget.set_marker(48.570083, 37.908243, text='міномет')
+        self.map_widget.set_marker(48.573059, 37.960736, text='гаубиця укрита')
+        self.map_widget.set_marker(48.596196, 37.949817, text='гаубиця укрита')
+        self.map_widget.set_marker(48.608206, 37.949736, text='гаубиця укрита')
+        self.map_widget.set_marker(48.602496, 37.964798, text='гаубиця укрита')
+        self.map_widget.set_marker(48.597342, 37.987914, text='логістичний центр')
+        self.map_widget.set_marker(48.588868, 38.00686, text='логістичний центр')
+        self.map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів')
+        self.map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів')
+        self.map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів')
+        self.map_widget.place(x=0, y=0)
+        self.map_widget.bind("<Button-1>", self.on_map_click)
+        
+        self.combo_position = ttk.Combobox(self.root, values=self.position_names, font=("Arial", 10))
+        self.combo_position.place(x=20, y=680)
+        
+        self.entry_lat = Entry(self.root, font=("Arial", 10))
+        self.entry_lat.place(x=280, y=680)
+        
+        self.entry_lon = Entry(self.root, font=("Arial", 10))
+        self.entry_lon.place(x=540, y=680)
+        
+        self.combo_artillery = ttk.Combobox(self.root, values=self.artillery_names, font=("Arial", 10))
+        self.combo_artillery.place(x=800, y=680)
+        self.combo_artillery.bind("<<ComboboxSelected>>", self.update_caliber)
+        
+        self.combo_caliber = ttk.Combobox(self.root, font=("Arial", 10))
+        self.combo_caliber.place(x=1060, y=680)
+        
+        Button(self.root, text="Вогонь!", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1300, y=630)
     
-    print(f"\nЗ позиції: {selected_position}\nВикористана зброя: {selected_artillery}\nЗнищена позиція: {request3}, {request4}")
-
-
-# кординати на мапі вибір
-def on_map_click(event):
-    # Отримати координати, куди було натиснуто
-    lat, lon = map_widget.get_coordinates_from_event(event)
+    def on_map_click(self, event):
+        lat, lon = self.map_widget.get_coordinates_from_event(event)
+        self.entry_lat.delete(0, END)
+        self.entry_lon.delete(0, END)
+        self.entry_lat.insert(0, lat)
+        self.entry_lon.insert(0, lon)
     
-    # Вставити координати в поля вводу
-    entry1.delete(0, END)
-    entry2.delete(0, END)
-    entry1.insert(0, lat)
-    entry2.insert(0, lon)
-
-
-# Оновлюємо комбобокс калібрів при виборі артилерії
-def update_caliber(event):
-    selected_artillery = combo4.get()
-    calibers = get_calibers_for_artillery(selected_artillery)
+    def update_caliber(self, event):
+        selected_artillery = self.combo_artillery.get()
+        calibers = self.get_calibers_for_artillery(selected_artillery)
+        self.combo_caliber.set('')
+        self.combo_caliber['values'] = calibers
+        if calibers:
+            self.combo_caliber.current(0)
     
-    # Очищаємо і оновлюємо комбобокс калібрів
-    combo_caliber.set('')
-    combo_caliber['values'] = calibers
-    if calibers:
-        combo_caliber.current(0)  # Встановлюємо перший доступний калібр як вибраний
-
-
-# Функція для отримання калібрів для вибраної артилерії
-def get_calibers_for_artillery(artillery_name):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT ammo FROM artillery WHERE name = ?", (artillery_name,))
-    calibers = cursor.fetchone()
-    conn.close()
+    def get_calibers_for_artillery(self, artillery_name):
+        query = "SELECT ammo FROM artillery WHERE name = ?"
+        calibers = self.db.fetch_all(query, (artillery_name,))
+        return self.get_field1_from_caliber(calibers[0][0]) if calibers else []
     
-    if calibers:
-        return get_field1_from_caliber(calibers[0])  # Викликаємо функцію для отримання значень з таблиці за калібром
-    return []
-
-
-# Функція для перевірки, чи існує таблиця в базі
-def table_exists(table_name):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
-    result = cursor.fetchone()
-    conn.close()
-    return result is not None
-
-
-# Функція для отримання значень поля field1 з таблиці, що називається калібром
-def get_field1_from_caliber(caliber):
-    if not table_exists(caliber):  # Перевіряємо, чи існує таблиця
-        print(f"Таблиця для калібру '{caliber}' не знайдена в базі даних.")
-        return []
+    def get_field1_from_caliber(self, caliber):
+        if not self.db.table_exists(caliber):
+            print(f"Таблиця '{caliber}' не знайдена.")
+            return []
+        query = f"SELECT field1 FROM '{caliber}'"
+        return [row[0] for row in self.db.fetch_all(query)]
     
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT field1 FROM '{caliber}'")  # Виконуємо запит до таблиці, ім'я якої - калібр
-    field1_values = cursor.fetchall()
-    conn.close()
-    
-    # Повертаємо список значень field1
-    return [field1[0] for field1 in field1_values]
+    def attack(self):
+        lat, lon = self.entry_lat.get().strip(), self.entry_lon.get().strip()
+        position = self.combo_position.get().strip()
+        artillery = self.combo_artillery.get().strip()
+        
+        if not lat or not lon or not position or not artillery:
+            print("Некоректні дані")
+            return
+        
+        query = "SELECT COUNT(*) FROM targets WHERE field3 = ? AND field4 = ?"
+        result = self.db.fetch_all(query, (lat, lon))
+        
+        if result[0][0] > 0:
+            print("Координати знайдено, ворога знищено")
+            self.db.execute_query("UPDATE targets SET destroyed = TRUE WHERE field3 = ? AND field4 = ?", (lat, lon))
+        else:
+            print("Координати не знайдено в базі даних.")
+        
+        self.entry_lat.delete(0, END)
+        self.entry_lon.delete(0, END)
 
-
-artillery_data = get_artillery_data()
-artillery_names = [row[1] for row in artillery_data]
-
-position_data = get_position_data()
-position_names = [row[2] for row in position_data]
-
-win = Tk()
-win.title("Військова Операція")
-# win.state('zoomed')
-
-width= win.winfo_screenwidth() 
-height= win.winfo_screenheight()
-win.geometry("%dx%d" % (width, height))
-win.resizable(True, True)
-win.config(bg="#2F4F2F")  
-
-map_widget = tkintermapview.TkinterMapView(win, width=1920, height=580, corner_radius=0)
-map_widget.set_position(48.59573572042534, 37.97750165860023)
-map_widget.set_zoom(12)
-map_widget.set_marker(48.594317, 37.914648, text='Піхота укрита')
-map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита')
-map_widget.set_marker(48.594317, 37.914648, text='Піхота')
-map_widget.set_marker(48.568261, 37.88323, text='Піхота укрита')
-map_widget.set_marker(48.580133, 37.897703, text='Піхота укрита')
-map_widget.set_marker(48.532218, 37.900205, text='Піхота укрита')
-map_widget.set_marker(48.557198, 37.903422, text='Піхота укрита')
-map_widget.set_marker(48.588623, 37.966295, text='ксп укрите')
-map_widget.set_marker(48.576391, 37.909502, text='міномет укритий')
-map_widget.set_marker(48.565392, 37.915432, text='міномет укритий')
-map_widget.set_marker(48.570083, 37.908243, text='міномет')
-map_widget.set_marker(48.573059, 37.960736, text='гаубиця укрита')
-map_widget.set_marker(48.596196, 37.949817, text='гаубиця укрита')
-map_widget.set_marker(48.608206, 37.949736, text='гаубиця укрита')
-map_widget.set_marker(48.602496, 37.964798, text='гаубиця укрита')
-map_widget.set_marker(48.597342, 37.987914, text='логістичний центр')
-map_widget.set_marker(48.588868, 38.00686, text='логістичний центр')
-map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів')
-map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів')
-map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів')
-map_widget.place(x=0, y=0)
-
-# Додаємо обробник для кліку на карті
-map_widget.bind("<Button-1>", on_map_click)
-
-bt = Button(text="Вогонь!", height=5, width=18, font=("Stencil", 12, "bold"), command=attack, bg="#556B2F", fg="white")
-bt.place(x=1300, y=630)
-
-lbl1 = ttk.Label(text="Позиція", background="#2F4F2F", foreground="white", font=("Arial", 20, "bold"))
-lbl2 = ttk.Label(text="Широта", background="#2F4F2F", foreground="white", font=("Arial", 20, "bold"))
-lbl3 = ttk.Label(text="Довгота", background="#2F4F2F", foreground="white", font=("Arial", 20, "bold"))
-lbl4 = ttk.Label(text="Зброя", background="#2F4F2F", foreground="white", font=("Arial", 20, "bold"))
-lbl5 = ttk.Label(text="Снаряд", background="#2F4F2F", foreground="white", font=("Arial", 20, "bold"))
-
-lbl1.place(x=20, y=640)
-lbl2.place(x=280, y=640)
-lbl3.place(x=540, y=640)
-lbl4.place(x=800, y=640)
-lbl5.place(x=1060, y=640)
-
-combo1 = ttk.Combobox(win, values=position_names, font=("Arial", 10))
-combo1.place(x=20, y=680)
-entry1 = Entry(win, font=("Arial", 10))
-entry1.place(x=280, y=680)
-entry2 = Entry(win, font=("Arial", 10))
-entry2.place(x=540, y=680)
-
-combo4 = ttk.Combobox(win, values=artillery_names, font=("Arial", 10))
-combo4.place(x=800, y=680)
-combo4.bind("<<ComboboxSelected>>", update_caliber)
-
-combo_caliber = ttk.Combobox(win, font=("Arial", 10))
-combo_caliber.place(x=1060, y=680)
-
-win.mainloop()
+if __name__ == "__main__":
+    root = Tk()
+    app = MilitaryApp(root)
+    root.mainloop()
