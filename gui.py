@@ -1,3 +1,4 @@
+
 import sqlite3
 from tkinter import *
 import tkintermapview
@@ -37,9 +38,12 @@ class MilitaryApp:
         
         self.artillery_data = self.db.fetch_all("SELECT * FROM artillery")
         self.position_data = self.db.fetch_all("SELECT * FROM units")
+        self.targets_data = self.db.fetch_all('SELECT * FROM targets')
         
         self.artillery_names = [row[1] for row in self.artillery_data]
         self.position_names = [row[2] for row in self.position_data]
+        self.targets_data = [row[1] for row in self.targets_data]
+        # self.units_names = 
         
         self.create_widgets()
 
@@ -47,33 +51,44 @@ class MilitaryApp:
         self.map_widget = tkintermapview.TkinterMapView(self.root, width=1920, height=580, corner_radius=0)
         self.map_widget.set_position(48.5957, 37.9775)
         self.map_widget.set_zoom(12)
-        self.map_widget.set_marker(48.594317, 37.914648, text='Піхота укрита')
-        self.map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита')
-        self.map_widget.set_marker(48.594317, 37.914648, text='Піхота')
-        self.map_widget.set_marker(48.568261, 37.88323, text='Піхота укрита')
-        self.map_widget.set_marker(48.580133, 37.897703, text='Піхота укрита')
-        self.map_widget.set_marker(48.532218, 37.900205, text='Піхота укрита')
-        self.map_widget.set_marker(48.557198, 37.903422, text='Піхота укрита')
-        self.map_widget.set_marker(48.588623, 37.966295, text='ксп укрите')
-        self.map_widget.set_marker(48.576391, 37.909502, text='міномет укритий')
-        self.map_widget.set_marker(48.565392, 37.915432, text='міномет укритий')
-        self.map_widget.set_marker(48.570083, 37.908243, text='міномет')
-        self.map_widget.set_marker(48.573059, 37.960736, text='гаубиця укрита')
-        self.map_widget.set_marker(48.596196, 37.949817, text='гаубиця укрита')
-        self.map_widget.set_marker(48.608206, 37.949736, text='гаубиця укрита')
-        self.map_widget.set_marker(48.602496, 37.964798, text='гаубиця укрита')
-        self.map_widget.set_marker(48.597342, 37.987914, text='логістичний центр')
-        self.map_widget.set_marker(48.588868, 38.00686, text='логістичний центр')
-        self.map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів')
-        self.map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів')
-        self.map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів')
+        self.map_widget.set_marker(48.60273, 37.938007, text='Піхота укрита Т-101')
+        self.map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита Т-102')
+        self.map_widget.set_marker(48.594317, 37.914648, text='Піхота Т-103')
+        self.map_widget.set_marker(48.568261, 37.88323, text='Піхота укрита Т-104')
+        self.map_widget.set_marker(48.580133, 37.897703, text='Піхота укрита Т-105')
+        self.map_widget.set_marker(48.532218, 37.900205, text='Піхота укрита Т-106')
+        self.map_widget.set_marker(48.557198, 37.903422, text='Піхота укрита Т-107')
+        self.map_widget.set_marker(48.588623, 37.966295, text='ксп укрите Т-201')
+        self.map_widget.set_marker(48.576391, 37.909502, text='міномет укритий Т-202')
+        self.map_widget.set_marker(48.565392, 37.915432, text='міномет укритий Т-203')
+        self.map_widget.set_marker(48.570083, 37.908243, text='міномет Т-204')
+        self.map_widget.set_marker(48.573059, 37.960736, text='гаубиця укрита Т-301')
+        self.map_widget.set_marker(48.596196, 37.949817, text='гаубиця укрита Т-302')
+        self.map_widget.set_marker(48.608206, 37.949736, text='гаубиця укрита Т-303')
+        self.map_widget.set_marker(48.602496, 37.964798, text='гаубиця укрита Т-304')
+        self.map_widget.set_marker(48.597342, 37.987914, text='логістичний центр Т-401')
+        self.map_widget.set_marker(48.588868, 38.00686, text='логістичний центр Т-402')
+        self.map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів Т-403')
+        self.map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів Т-404')
+        self.map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів Т-405')
         self.map_widget.place(x=0, y=0)
         self.map_widget.bind("<Button-1>", self.on_map_click)
+
+        self.lbl1 = Label(self.root, text='Позиція', font=("Arial", 10))
+        self.lbl2 = Label(self.root, text='Ціль', font=("Arial", 10))
+        self.lbl3 = Label(self.root, text='Боєприпас', font=("Arial", 10))
+        self.lbl4 = Label(self.root, text='Кількість', font=("Arial", 10))
+        
+        self.lbl1.place(x=20, y=650)
+        self.lbl2.place(x=280, y=650)
+        self.lbl3.place(x=540, y=650)
+        self.lbl4.place(x=800, y=650)
+
         
         self.combo_position = ttk.Combobox(self.root, values=self.position_names, font=("Arial", 10))
         self.combo_position.place(x=20, y=680)
         
-        self.entry_lat = Entry(self.root, font=("Arial", 10))
+        self.entry_lat = ttk.Combobox(self.root, values=self.targets_data)
         self.entry_lat.place(x=280, y=680)
         
         self.entry_lon = Entry(self.root, font=("Arial", 10))
@@ -86,7 +101,7 @@ class MilitaryApp:
         self.combo_caliber = ttk.Combobox(self.root, font=("Arial", 10))
         self.combo_caliber.place(x=1060, y=680)
         
-        Button(self.root, text="Вогонь!", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1300, y=630)
+        Button(self.root, text="В'їбать", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1300, y=630)
     
     def on_map_click(self, event):
         lat, lon = self.map_widget.get_coordinates_from_event(event)
@@ -140,3 +155,4 @@ if __name__ == "__main__":
     root = Tk()
     app = MilitaryApp(root)
     root.mainloop()
+
