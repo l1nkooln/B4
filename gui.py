@@ -1,4 +1,3 @@
-
 import sqlite3
 from tkinter import *
 import tkintermapview
@@ -28,6 +27,7 @@ class DatabaseManager:
         query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
         return bool(self.fetch_all(query, (table_name,)))
 
+
 class MilitaryApp:
     def __init__(self, root):
         self.db = DatabaseManager()
@@ -42,8 +42,7 @@ class MilitaryApp:
         
         self.artillery_names = [row[1] for row in self.artillery_data]
         self.position_names = [row[2] for row in self.position_data]
-        self.targets_data = [row[1] for row in self.targets_data]
-        # self.units_names = 
+        self.target_names = [row[1] for row in self.targets_data]  # Цілі
         
         self.create_widgets()
 
@@ -51,6 +50,9 @@ class MilitaryApp:
         self.map_widget = tkintermapview.TkinterMapView(self.root, width=1920, height=580, corner_radius=0)
         self.map_widget.set_position(48.5957, 37.9775)
         self.map_widget.set_zoom(12)
+
+        # Мітки на карті
+        # Додаткові мітки для позицій та цілей на карті
         self.map_widget.set_marker(48.60273, 37.938007, text='Піхота укрита Т-101')
         self.map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита Т-102')
         self.map_widget.set_marker(48.594317, 37.914648, text='Піхота Т-103')
@@ -74,8 +76,9 @@ class MilitaryApp:
         self.map_widget.place(x=0, y=0)
         self.map_widget.bind("<Button-1>", self.on_map_click)
 
+        # Лейбли для UI
         self.lbl1 = Label(self.root, text='Підрозділ', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
-        self.lbl5 = Label(self.root, text ='Позиція', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl5 = Label(self.root, text='Позиція', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
         self.lbl2 = Label(self.root, text='Ціль', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
         self.lbl3 = Label(self.root, text='Боєприпас', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
         self.lbl4 = Label(self.root, text='Кількість', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
@@ -86,25 +89,26 @@ class MilitaryApp:
         self.lbl3.place(x=540, y=650)
         self.lbl4.place(x=800, y=650)
 
-        
+        # Комбобокси для вибору
         self.combo_position = ttk.Combobox(self.root, values=self.position_names, font=("Arial", 10))
         self.combo_position.place(x=20, y=650)
         
         self.combo_pos_guns = ttk.Combobox(self.root, font=("Arial", 10))
         self.combo_pos_guns.place(x=20, y=725)
 
-        self.entry_lat = ttk.Combobox(self.root, values=self.targets_data)
+        self.entry_lat = ttk.Combobox(self.root, values=self.target_names)
         self.entry_lat.place(x=280, y=680)
         
         self.combo_artillery = ttk.Combobox(self.root, values=self.artillery_names, font=("Arial", 10))
         self.combo_artillery.place(x=540, y=680)
         self.combo_artillery.bind("<<ComboboxSelected>>", self.update_caliber)
         
-        self.combo_artillery = Entry(self.root,font=("Arial", 10))
+        self.combo_artillery = Entry(self.root, font=("Arial", 10))
         self.combo_artillery.place(x=800, y=680)
         
         Button(self.root, text="В'їбать", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1200, y=610)
-        self.btn_list = Button(self.root, text='Виконані завдання', font=("Stencil", 12, "bold"),bg="#556B2F", fg="white", width=18).place(x=1200, y=730)
+        self.btn_list = Button(self.root, text='Виконані завдання', font=("Stencil", 12, "bold"), bg="#556B2F", fg="white", width=18).place(x=1200, y=730)
+
     def on_map_click(self, event):
         lat, lon = self.map_widget.get_coordinates_from_event(event)
         self.entry_lat.delete(0, END)
@@ -133,28 +137,29 @@ class MilitaryApp:
         return [row[0] for row in self.db.fetch_all(query)]
     
     def attack(self):
-        lat, lon = self.entry_lat.get().strip(), self.entry_lon.get().strip()
-        position = self.combo_position.get().strip()
-        artillery = self.combo_artillery.get().strip()
-        
-        if not lat or not lon or not position or not artillery:
+        target = self.entry_lat.get().strip()  # отримуємо значення цілі
+
+        if not target:
             print("Некоректні дані")
             return
+
+        # Перевірка, що вибрана ціль правильна
+        print(f"Обрана ціль: {target}")
+
+        # Пошук по назві цілі в таблиці "targets"
+        query = "SELECT field1 FROM targets WHERE field1 = ?"
+        result = self.db.fetch_all(query, (target,))
         
-        query = "SELECT COUNT(*) FROM targets WHERE field3 = ? AND field4 = ?"
-        result = self.db.fetch_all(query, (lat, lon))
-        
-        if result[0][0] > 0:
-            print("Координати знайдено, ворога знищено")
-            self.db.execute_query("UPDATE targets SET destroyed = TRUE WHERE field3 = ? AND field4 = ?", (lat, lon))
+        if result:
+            print(f"Ціль {target} знищена.")
+            # Оновлення статусу знищення для цієї цілі
+            self.db.execute_query("UPDATE targets SET destroyed = TRUE WHERE field1 = ?", (target,))
         else:
-            print("Координати не знайдено в базі даних.")
-        
-        self.entry_lat.delete(0, END)
-        self.entry_lon.delete(0, END)
+            print(f"Ціль {target} не знайдена в базі даних.")
+    
+
 
 if __name__ == "__main__":
     root = Tk()
     app = MilitaryApp(root)
     root.mainloop()
-
