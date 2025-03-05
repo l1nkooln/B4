@@ -74,35 +74,37 @@ class MilitaryApp:
         self.map_widget.place(x=0, y=0)
         self.map_widget.bind("<Button-1>", self.on_map_click)
 
-        self.lbl1 = Label(self.root, text='Позиція', font=("Arial", 10))
-        self.lbl2 = Label(self.root, text='Ціль', font=("Arial", 10))
-        self.lbl3 = Label(self.root, text='Боєприпас', font=("Arial", 10))
-        self.lbl4 = Label(self.root, text='Кількість', font=("Arial", 10))
+        self.lbl1 = Label(self.root, text='Підрозділ', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl5 = Label(self.root, text ='Позиція', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl2 = Label(self.root, text='Ціль', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl3 = Label(self.root, text='Боєприпас', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl4 = Label(self.root, text='Кількість', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
         
-        self.lbl1.place(x=20, y=650)
+        self.lbl1.place(x=20, y=620)
+        self.lbl5.place(x=20, y=695)
         self.lbl2.place(x=280, y=650)
         self.lbl3.place(x=540, y=650)
         self.lbl4.place(x=800, y=650)
 
         
         self.combo_position = ttk.Combobox(self.root, values=self.position_names, font=("Arial", 10))
-        self.combo_position.place(x=20, y=680)
+        self.combo_position.place(x=20, y=650)
         
+        self.combo_pos_guns = ttk.Combobox(self.root, font=("Arial", 10))
+        self.combo_pos_guns.place(x=20, y=725)
+
         self.entry_lat = ttk.Combobox(self.root, values=self.targets_data)
         self.entry_lat.place(x=280, y=680)
         
-        self.entry_lon = Entry(self.root, font=("Arial", 10))
-        self.entry_lon.place(x=540, y=680)
-        
         self.combo_artillery = ttk.Combobox(self.root, values=self.artillery_names, font=("Arial", 10))
-        self.combo_artillery.place(x=800, y=680)
+        self.combo_artillery.place(x=540, y=680)
         self.combo_artillery.bind("<<ComboboxSelected>>", self.update_caliber)
         
-        self.combo_caliber = ttk.Combobox(self.root, font=("Arial", 10))
-        self.combo_caliber.place(x=1060, y=680)
+        self.combo_artillery = Entry(self.root,font=("Arial", 10))
+        self.combo_artillery.place(x=800, y=680)
         
-        Button(self.root, text="В'їбать", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1300, y=630)
-    
+        Button(self.root, text="В'їбать", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1200, y=610)
+        self.btn_list = Button(self.root, text='Виконані завдання', font=("Stencil", 12, "bold"),bg="#556B2F", fg="white", width=18).place(x=1200, y=730)
     def on_map_click(self, event):
         lat, lon = self.map_widget.get_coordinates_from_event(event)
         self.entry_lat.delete(0, END)
