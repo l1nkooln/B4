@@ -86,10 +86,10 @@ class MilitaryApp:
         self.combo_artillery.place(x=540, y=680)
         self.combo_artillery.bind("<<ComboboxSelected>>", self.update_caliber)
         
-        self.combo_caliber = ttk.Combobox(self.root)
-        self.combo_caliber.place(x=800, y=680)
+        self.quantity = Entry(self.root)
+        self.quantity.place(x=800, y=680)
 
-        Button(self.root, text="В'їбать", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1200, y=590)
+        Button(self.root, text="Вогонь", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1200, y=590)
         self.btn_list = Button(self.root, text='Виконані завдання', font=("Stencil", 12, "bold"), bg="#556B2F", fg="white", width=18).place(x=1200, y=705)
         Button(self.root, text="Відновити цілі", font=("Stencil", 12, "bold"), width=18, command=self.restore_targets, bg="#556B2F", fg="white").place(x=1200, y=745)
 
