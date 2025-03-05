@@ -1,0 +1,58 @@
+{
+    "tables": {
+        "ammo": {
+            "columns": {
+                "id": "INTEGER", // primary key, not null
+                "code": "TEXT",
+                "caliber": "INTEGER",
+                "type": "TEXT",
+                "mass": "INTEGER",
+                "destroyed": "BOOL"
+            }
+        }
+        "units": {
+            "columns": {
+                "id": "INTEGER", // primary key, not null
+                "name": "TEXT",
+                "alias": "TEXT",
+                "people_count": "INTEGER",
+                "experience": "INTEGER"
+            }
+        },
+        "targets": {
+            "columns": {
+                "name": "TEXT", // primary key, not null
+                "description": "TEXT",
+                "x": "INTEGER",
+                "y": "INTEGER",
+                "destroyed": "BOOL"
+            }
+        },
+        "artillery": {
+            "columns": {
+                "id": "INTEGER", // primary key, not null
+                "name": "TEXT",
+                "caliber": "INTEGER",
+                "range_km": "FLOAT",
+                "fire_position_id": "INTEGER", // foreign key
+                "destroyed": "BOOL"
+            }
+        },
+        "fire_positions": {
+            "columns": {
+                "id": "INTEGER", // primary key, not null
+                "x": "INTEGER",
+                "y": "INTEGER",
+                "destroyed": "BOOL"
+            }
+        },
+        "fire_tasks": {
+            "columns": {
+                "id": "INTEGER", // primary key, not null
+                "target_name": "TEXT",
+                "ammo_type": "TEXT",
+                "ammo_count": "INTEGER"
+            }
+        }
+    }
+}
