@@ -36,10 +36,11 @@ class MilitaryApp:
         self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}")
         self.root.config(bg="#2F4F2F")
         
+        self.targets_data = self.db.fetch_all('SELECT * FROM targets')
+        self.target_markers = {}  # Збереження міток для оновлення
         self.artillery_data = self.db.fetch_all("SELECT * FROM artillery")
         self.position_data = self.db.fetch_all("SELECT * FROM units")
         self.targets_data = self.db.fetch_all('SELECT * FROM targets')
-        
         self.artillery_names = [row[1] for row in self.artillery_data]
         self.position_names = [row[2] for row in self.position_data]
         self.target_names = [row[1] for row in self.targets_data]  # Цілі
@@ -50,33 +51,10 @@ class MilitaryApp:
         self.map_widget = tkintermapview.TkinterMapView(self.root, width=1920, height=580, corner_radius=0)
         self.map_widget.set_position(48.5957, 37.9775)
         self.map_widget.set_zoom(12)
-
-        # Мітки на карті
-        # Додаткові мітки для позицій та цілей на карті
-        self.map_widget.set_marker(48.60273, 37.938007, text='Піхота укрита Т-101')
-        self.map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита Т-102')
-        self.map_widget.set_marker(48.594317, 37.914648, text='Піхота Т-103')
-        self.map_widget.set_marker(48.568261, 37.88323, text='Піхота укрита Т-104')
-        self.map_widget.set_marker(48.580133, 37.897703, text='Піхота укрита Т-105')
-        self.map_widget.set_marker(48.532218, 37.900205, text='Піхота укрита Т-106')
-        self.map_widget.set_marker(48.557198, 37.903422, text='Піхота укрита Т-107')
-        self.map_widget.set_marker(48.588623, 37.966295, text='ксп укрите Т-201')
-        self.map_widget.set_marker(48.576391, 37.909502, text='міномет укритий Т-202')
-        self.map_widget.set_marker(48.565392, 37.915432, text='міномет укритий Т-203')
-        self.map_widget.set_marker(48.570083, 37.908243, text='міномет Т-204')
-        self.map_widget.set_marker(48.573059, 37.960736, text='гаубиця укрита Т-301')
-        self.map_widget.set_marker(48.596196, 37.949817, text='гаубиця укрита Т-302')
-        self.map_widget.set_marker(48.608206, 37.949736, text='гаубиця укрита Т-303')
-        self.map_widget.set_marker(48.602496, 37.964798, text='гаубиця укрита Т-304')
-        self.map_widget.set_marker(48.597342, 37.987914, text='логістичний центр Т-401')
-        self.map_widget.set_marker(48.588868, 38.00686, text='логістичний центр Т-402')
-        self.map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів Т-403')
-        self.map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів Т-404')
-        self.map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів Т-405')
         self.map_widget.place(x=0, y=0)
-        self.map_widget.bind("<Button-1>", self.on_map_click)
-
-        # Лейбли для UI
+        
+        self.load_targets()
+        
         self.lbl1 = Label(self.root, text='Підрозділ', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
         self.lbl5 = Label(self.root, text='Позиція', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
         self.lbl2 = Label(self.root, text='Ціль', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
@@ -106,16 +84,35 @@ class MilitaryApp:
         self.combo_artillery = Entry(self.root, font=("Arial", 10))
         self.combo_artillery.place(x=800, y=680)
         
-        Button(self.root, text="В'їбать", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1200, y=610)
-        self.btn_list = Button(self.root, text='Виконані завдання', font=("Stencil", 12, "bold"), bg="#556B2F", fg="white", width=18).place(x=1200, y=730)
+        Button(self.root, text="В'їбать", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1200, y=590)
+        self.btn_list = Button(self.root, text='Виконані завдання', font=("Stencil", 12, "bold"), bg="#556B2F", fg="white", width=18).place(x=1200, y=705)
+        Button(self.root, text="Відновити цілі", font=("Stencil", 12, "bold"), width=18, command=self.restore_targets, bg="#556B2F", fg="white").place(x=1200, y=745)
 
-    def on_map_click(self, event):
-        lat, lon = self.map_widget.get_coordinates_from_event(event)
-        self.entry_lat.delete(0, END)
-        self.entry_lon.delete(0, END)
-        self.entry_lat.insert(0, lat)
-        self.entry_lon.insert(0, lon)
-    
+    def restore_targets(self):
+        # Оновлення всіх цілей у базі даних
+        self.db.execute_query("UPDATE targets SET destroyed = 0")
+        
+        # Видаляємо всі мітки з карти
+        for _, marker in self.target_markers.values():
+            self.map_widget.delete(marker)
+
+        # Завантажуємо цілі заново
+        self.targets_data = self.db.fetch_all('SELECT * FROM targets')
+        self.load_targets()
+
+        print("Усі цілі відновлено!")
+
+    def load_targets(self):
+        for row in self.targets_data:
+            target_id, name, _, lat, lon, destroyed = row
+            lat, lon = float(lat), float(lon)
+            
+            if destroyed:
+                marker = self.map_widget.set_marker(lat, lon, text=f"{name} (destroyed)")
+            else:
+                marker = self.map_widget.set_marker(lat, lon, text=name)
+            
+            self.target_markers[name] = (target_id, marker)
     def update_caliber(self, event):
         selected_artillery = self.combo_artillery.get()
         calibers = self.get_calibers_for_artillery(selected_artillery)
@@ -123,41 +120,24 @@ class MilitaryApp:
         self.combo_caliber['values'] = calibers
         if calibers:
             self.combo_caliber.current(0)
-    
-    def get_calibers_for_artillery(self, artillery_name):
-        query = "SELECT ammo FROM artillery WHERE name = ?"
-        calibers = self.db.fetch_all(query, (artillery_name,))
-        return self.get_field1_from_caliber(calibers[0][0]) if calibers else []
-    
-    def get_field1_from_caliber(self, caliber):
-        if not self.db.table_exists(caliber):
-            print(f"Таблиця '{caliber}' не знайдена.")
-            return []
-        query = f"SELECT field1 FROM '{caliber}'"
-        return [row[0] for row in self.db.fetch_all(query)]
-    
     def attack(self):
-        target = self.entry_lat.get().strip()  # отримуємо значення цілі
+        target_name = self.entry_lat.get().strip()
 
-        if not target:
+        if not target_name:
             print("Некоректні дані")
             return
-
-        # Перевірка, що вибрана ціль правильна
-        print(f"Обрана ціль: {target}")
-
-        # Пошук по назві цілі в таблиці "targets"
-        query = "SELECT field1 FROM targets WHERE field1 = ?"
-        result = self.db.fetch_all(query, (target,))
         
-        if result:
-            print(f"Ціль {target} знищена.")
-            # Оновлення статусу знищення для цієї цілі
-            self.db.execute_query("UPDATE targets SET destroyed = TRUE WHERE field1 = ?", (target,))
+        if target_name in self.target_markers:
+            target_id, marker = self.target_markers[target_name]
+            self.db.execute_query("UPDATE targets SET destroyed = 1 WHERE number = ?", (target_id,))
+            
+            lat, lon = marker.position
+            self.map_widget.delete(marker)
+            new_marker = self.map_widget.set_marker(lat, lon, text=f"{target_name} (destroyed)")
+            self.target_markers[target_name] = (target_id, new_marker)
+            print(f"Ціль {target_name} знищена.")
         else:
-            print(f"Ціль {target} не знайдена в базі даних.")
-    
-
+            print(f"Ціль {target_name} не знайдена в базі даних.")
 
 if __name__ == "__main__":
     root = Tk()
