@@ -1,270 +1,290 @@
-# # from tkinter import *
-# # import tkintermapview
-# # from tkinter import ttk
-
-# # position = ['Туча', 'Сокіл', 'Заєць']
-# # gun = ['Гвоздика', 'Акація', 'Піон', '122-мм', '120-мм']
-# # caliber = ['120 high-explosive fragmentation', '120 smoke', '120 light', '122 high-explosive fragmentation', '122 fire', '203 cumulative', '152 high-explosive fragmentation']
-
-# # win = Tk()
-# # win.title("В'їбаш по ворогу")
-# # win.geometry('1000x600')
-# # win.resizable(False, False)
-# # win.config(bg="#335233")
-
-# # map_widget = tkintermapview.TkinterMapView(win, width=800, height=500, corner_radius=0)
-# # map_widget.set_position(48.59573572042534, 37.97750165860023)
-# # map_widget.set_zoom(12)
-# # map_widget.set_marker(48.594317, 37.914648, text='Піхота укрита')
-# # map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита')
-# # map_widget.set_marker(48.594317, 37.914648, text='Піхота')
-# # map_widget.set_marker(48.568261, 37.88323, text='Піхота укрита')
-# # map_widget.set_marker(48.580133, 37.897703, text='Піхота укрита')
-# # map_widget.set_marker(48.532218, 37.900205, text='Піхота укрита')
-# # map_widget.set_marker(48.557198, 37.903422, text='Піхота укрита')
-# # map_widget.set_marker(48.588623, 37.966295, text='ксп укрите')
-# # map_widget.set_marker(48.576391, 37.909502, text='міномет укритий')
-# # map_widget.set_marker(48.565392, 37.915432, text='міномет укритий')
-# # map_widget.set_marker(48.570083, 37.908243, text='міномет')
-# # map_widget.set_marker(48.573059, 37.960736, text='гаубиця укрита')
-# # map_widget.set_marker(48.596196, 37.949817, text='гаубиця укрита')
-# # map_widget.set_marker(48.608206, 37.949736, text='гаубиця укрита')
-# # map_widget.set_marker(48.602496, 37.964798, text='гаубиця укрита')
-# # map_widget.set_marker(48.597342, 37.987914, text='логістичний центр')
-# # map_widget.set_marker(48.588868, 38.00686, text='логістичний центр')
-# # map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів')
-# # map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів')
-# # map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів')
-
-# # bt = Button(text="В'їбати", height=5, width=20, font=("Arial", 10, "bold"))
-# # bt.place(x=817, y=50)
-
-# # lbl1 = ttk.Label(text="Позиція")
-# # lbl2 = ttk.Label(text="Широта")
-# # lbl3 = ttk.Label(text="Довгота")
-# # lbl4 = ttk.Label(text="Зброя")
-# # lbl5 = ttk.Label(text="Снаряд")
-# # lbl1.place(x=20, y=510)
-# # lbl2.place(x=200, y=510)
-# # lbl3.place(x=380, y=510)
-# # lbl4.place(x=560, y=510)
-# # lbl5.place(x=740, y=510)
-
-
-# # combo1 = ttk.Combobox(win, values=position)
-# # combo1.place(x=20, y=540)
-# # combo2 = ttk.Combobox(win, values=["Енеїда", "Тарас Бульба", "Гайдамаки", "Собор"])
-# # combo2.place(x=200, y=540)
-# # combo3 = ttk.Combobox(win, values=["Енеїда", "Тарас Бульба", "Гайдамаки", "Собор"])
-# # combo3.place(x=380, y=540)
-# # combo4 = ttk.Combobox(win, values=gun)
-# # combo4.place(x=560, y=540)
-# # combo5 = ttk.Combobox(win, values=caliber)
-# # combo5.place(x=740, y=540)
-
-
-# # map_widget.place(x=0, y=0)
-
-# # win.mainloop()
-
-# import sqlite3
-# from tkinter import *
-# import tkintermapview
-# from tkinter import ttk
-
-# # Функция для получения данных из базы
-# def get_artillery_data():
-#     conn = sqlite3.connect('database.db')
-#     cursor = conn.cursor()
-#     cursor.execute("SELECT * FROM artillery")
-#     rows = cursor.fetchall()
-#     conn.close()
-#     return rows
-
-# # Функция для сохранения выбора
-# def save_user_choice(choice_data):
-#     print(f"Ваш вибір збережено: {choice_data}")
-
-# # Функция обработки выбора из combo4
-# def on_artillery_select(event):
-#     selected_index = combo4.current()
-#     if selected_index >= 0:
-#         selected_artillery = artillery_data[selected_index]
-#         save_user_choice(selected_artillery)
-
-# # Получаем список вооружений из базы
-# artillery_data = get_artillery_data()
-# artillery_names = [row[1] for row in artillery_data]  # Извлекаем только названия
-
-# position = ['Туча', 'Сокіл', 'Заєць']
-# caliber = ['120 high-explosive fragmentation', '120 smoke', '120 light', '122 high-explosive fragmentation', '122 fire', '203 cumulative', '152 high-explosive fragmentation']
-
-# win = Tk()
-# win.title("В'їбаш по ворогу")
-# win.geometry('1000x600')
-# win.resizable(False, False)
-# win.config(bg="#335233")
-
-# map_widget = tkintermapview.TkinterMapView(win, width=800, height=500, corner_radius=0)
-# map_widget.set_position(48.59573572042534, 37.97750165860023)
-# map_widget.set_zoom(12)
-# map_widget.set_marker(48.594317, 37.914648, text='Піхота укрита')
-# map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита')
-# map_widget.set_marker(48.594317, 37.914648, text='Піхота')
-# map_widget.set_marker(48.568261, 37.88323, text='Піхота укрита')
-# map_widget.set_marker(48.580133, 37.897703, text='Піхота укрита')
-# map_widget.set_marker(48.532218, 37.900205, text='Піхота укрита')
-# map_widget.set_marker(48.557198, 37.903422, text='Піхота укрита')
-# map_widget.set_marker(48.588623, 37.966295, text='ксп укрите')
-# map_widget.set_marker(48.576391, 37.909502, text='міномет укритий')
-# map_widget.set_marker(48.565392, 37.915432, text='міномет укритий')
-# map_widget.set_marker(48.570083, 37.908243, text='міномет')
-# map_widget.set_marker(48.573059, 37.960736, text='гаубиця укрита')
-# map_widget.set_marker(48.596196, 37.949817, text='гаубиця укрита')
-# map_widget.set_marker(48.608206, 37.949736, text='гаубиця укрита')
-# map_widget.set_marker(48.602496, 37.964798, text='гаубиця укрита')
-# map_widget.set_marker(48.597342, 37.987914, text='логістичний центр')
-# map_widget.set_marker(48.588868, 38.00686, text='логістичний центр')
-# map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів')
-# map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів')
-# map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів')
-# map_widget.place(x=0, y=0)
-
-# bt = Button(text="В'їбати", height=5, width=20, font=("Arial", 10, "bold"))
-# bt.place(x=817, y=50)
-
-# lbl1 = ttk.Label(text="Позиція")
-# lbl2 = ttk.Label(text="Широта")
-# lbl3 = ttk.Label(text="Довгота")
-# lbl4 = ttk.Label(text="Зброя")
-# lbl5 = ttk.Label(text="Снаряд")
-# lbl1.place(x=20, y=510)
-# lbl2.place(x=200, y=510)
-# lbl3.place(x=380, y=510)
-# lbl4.place(x=560, y=510)
-# lbl5.place(x=740, y=510)
-
-# combo1 = ttk.Combobox(win, values=position)
-# combo1.place(x=20, y=540)
-# combo2 = ttk.Combobox(win, values=["Енеїда", "Тарас Бульба", "Гайдамаки", "Собор"])
-# combo2.place(x=200, y=540)
-# combo3 = ttk.Combobox(win, values=["Енеїда", "Тарас Бульба", "Гайдамаки", "Собор"])
-# combo3.place(x=380, y=540)
-# combo4 = ttk.Combobox(win, values=artillery_names)
-# combo4.place(x=560, y=540)
-# combo4.bind("<<ComboboxSelected>>", on_artillery_select)  # Привязываем обработчик
-# combo5 = ttk.Combobox(win, values=caliber)
-# combo5.place(x=740, y=540)
-
-# win.mainloop()
-
 import sqlite3
 from tkinter import *
 import tkintermapview
 from tkinter import ttk
 
-# Функция для получения данных из базы
-def get_artillery_data():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM artillery")
-    rows = cursor.fetchall()
-    conn.close()
-    return rows
 
-# Функция для получения данных о позициях
-def get_position_data():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM units")
-    rows = cursor.fetchall()
-    conn.close()
-    return rows
+class DatabaseManager:
+    def __init__(self, db_name='database.db'):
+        self.db_name = db_name
 
-# Функция для сохранения выбора
-def save_user_choice(choice_data):
-    print(f"Ваш вибір збережено: {choice_data}")
+    def execute_query(self, query, params=()):
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        conn.commit()
+        conn.close()
 
-# Функция обработки выбора из combo4
-def on_artillery_select(event):
-    selected_index = combo4.current()
-    if selected_index >= 0:
-        selected_artillery = artillery_data[selected_index]
-        save_user_choice(selected_artillery)
+    def fetch_all(self, query, params=()):
+        conn = sqlite3.connect(self.db_name)
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
 
-# Функция обработки выбора из combo1
-def on_position_select(event):
-    selected_index = combo1.current()
-    if selected_index >= 0:
-        selected_position = position_data[selected_index]
-        save_user_choice(selected_position)
+    def table_exists(self, table_name):
+        query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
+        return bool(self.fetch_all(query, (table_name,)))
 
-# Получаем список вооружений и позиций из базы
-artillery_data = get_artillery_data()
-artillery_names = [row[1] for row in artillery_data]  # Извлекаем только названия
 
-position_data = get_position_data()
-position_names = [row[2] for row in position_data]  # Извлекаем только названия
+class MilitaryApp:
+    def __init__(self, root):
+        self.db = DatabaseManager()
+        self.root = root
+        self.root.title("Військова Операція")
+        self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}")
+        self.root.config(bg="#2F4F2F")
+        
+        
+        self.targets_data = self.db.fetch_all('SELECT * FROM targets')
+        self.target_markers = {}  # Збереження міток для оновлення
+        self.artillery_data = self.db.fetch_all("SELECT * FROM artillery")
+        self.position_data = self.db.fetch_all("SELECT * FROM units")
+        self.targets_data = self.db.fetch_all('SELECT * FROM targets')
+        self.units_position_data = self.db.fetch_all('SELECT * FROM position')
+        self.artillery_names = [row[1] for row in self.artillery_data]
+        self.position_names = [row[2] for row in self.position_data]
+        self.target_names = [row[1] for row in self.targets_data]
+        self.units_position = [row[1] for row in self.units_position_data]   # Цілі
+        
+        self.create_widgets()
+        self.load_position_units()
+        self.load_positions()
 
-caliber = ['120 high-explosive fragmentation', '120 smoke', '120 light', '122 high-explosive fragmentation', '122 fire', '203 cumulative', '152 high-explosive fragmentation']
+    def create_widgets(self):
+        self.map_widget = tkintermapview.TkinterMapView(self.root, width=1920, height=580, corner_radius=0)
+        self.map_widget.set_position(48.5957, 37.9775)
+        self.map_widget.set_zoom(12)
+        self.map_widget.place(x=0, y=0)
+        
+        
+        self.load_targets()
+        
+        self.lbl1 = Label(self.root, text='Підрозділ', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl5 = Label(self.root, text='Позиція', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl2 = Label(self.root, text='Ціль', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl3 = Label(self.root, text='Боєприпас', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
+        self.lbl4 = Label(self.root, text='Кількість', font=("Stencil", 12, "bold"), bg="#2F4F2F", fg='white')
 
-win = Tk()
-win.title("В'їбаш по ворогу")
-win.geometry('1000x600')
-win.resizable(False, False)
-win.config(bg="#335233")
+        
+        
+        self.lbl1.place(x=20, y=620)
+        self.lbl5.place(x=20, y=695)
+        self.lbl2.place(x=280, y=650)
+        self.lbl3.place(x=540, y=650)
+        self.lbl4.place(x=800, y=650)
 
-map_widget = tkintermapview.TkinterMapView(win, width=800, height=500, corner_radius=0)
-map_widget.set_position(48.59573572042534, 37.97750165860023)
-map_widget.set_zoom(12)
-map_widget.set_marker(48.594317, 37.914648, text='Піхота укрита')
-map_widget.set_marker(48.605858, 37.917671, text='Піхота укрита')
-map_widget.set_marker(48.594317, 37.914648, text='Піхота')
-map_widget.set_marker(48.568261, 37.88323, text='Піхота укрита')
-map_widget.set_marker(48.580133, 37.897703, text='Піхота укрита')
-map_widget.set_marker(48.532218, 37.900205, text='Піхота укрита')
-map_widget.set_marker(48.557198, 37.903422, text='Піхота укрита')
-map_widget.set_marker(48.588623, 37.966295, text='ксп укрите')
-map_widget.set_marker(48.576391, 37.909502, text='міномет укритий')
-map_widget.set_marker(48.565392, 37.915432, text='міномет укритий')
-map_widget.set_marker(48.570083, 37.908243, text='міномет')
-map_widget.set_marker(48.573059, 37.960736, text='гаубиця укрита')
-map_widget.set_marker(48.596196, 37.949817, text='гаубиця укрита')
-map_widget.set_marker(48.608206, 37.949736, text='гаубиця укрита')
-map_widget.set_marker(48.602496, 37.964798, text='гаубиця укрита')
-map_widget.set_marker(48.597342, 37.987914, text='логістичний центр')
-map_widget.set_marker(48.588868, 38.00686, text='логістичний центр')
-map_widget.set_marker(48.595533, 38.035939, text='склад боєприпасів')
-map_widget.set_marker(48.602527, 38.004359, text='склад боєприпасів')
-map_widget.set_marker(48.571236, 38.012168, text='склад боєприпасів')
-map_widget.place(x=0, y=0)
+        # Комбобокси для вибору
+        self.combo_position_unit = ttk.Combobox(self.root, font=("Arial", 10))
+        self.combo_position_unit.place(x=20, y=650)
+        self.combo_position_unit.bind("<<ComboboxSelected>>", self.update_position_options)
 
-bt = Button(text="В'їбати", height=5, width=20, font=("Arial", 10, "bold"))
-bt.place(x=817, y=50)
+        self.combo_position = ttk.Combobox(self.root, font=("Arial", 10))
+        self.combo_position.place(x=20, y=720)
+        
+        self.entry_lat = ttk.Combobox(self.root, values=self.target_names)
+        self.entry_lat.place(x=280, y=680)
+        
+        self.combo_artillery = ttk.Combobox(self.root, values=self.artillery_names, font=("Arial", 10))
+        self.combo_artillery.place(x=540, y=680)
+        self.combo_artillery.bind("<<ComboboxSelected>>", self.update_caliber)
+        
+        self.quantity = Entry(self.root)
+        self.quantity.place(x=800, y=680)
 
-lbl1 = ttk.Label(text="Позиція")
-lbl2 = ttk.Label(text="Широта")
-lbl3 = ttk.Label(text="Довгота")
-lbl4 = ttk.Label(text="Зброя")
-lbl5 = ttk.Label(text="Снаряд")
-lbl1.place(x=20, y=510)
-lbl2.place(x=200, y=510)
-lbl3.place(x=380, y=510)
-lbl4.place(x=560, y=510)
-lbl5.place(x=740, y=510)
+        Button(self.root, text="Вогонь", height=5, width=18, font=("Stencil", 12, "bold"), command=self.attack, bg="#556B2F", fg="white").place(x=1200, y=590)
+        self.btn_list = Button(self.root, text='Виконані завдання', font=("Stencil", 12, "bold"), bg="#556B2F", fg="white", width=18, command=self.show_history).place(x=1200, y=705)
+        Button(self.root, text="Відновити цілі", font=("Stencil", 12, "bold"), width=18, command=self.restore_targets, bg="#556B2F", fg="white").place(x=1200, y=745)
+        Button(self.root, text="Переїзд", width=18, font=("Stencil", 12, "bold"), command=self.move_markers, bg="#556B2F", fg="white").place(x=1000,y=745)
+        Button(self.root, text="Переїзд початок", width=18, font=("Stencil", 12, "bold"), command=self.reset_markers, bg="#556B2F", fg="white").place(x=1000, y=705)
 
-combo1 = ttk.Combobox(win, values=position_names)
-combo1.place(x=20, y=540)
-combo1.bind("<<ComboboxSelected>>", on_position_select)  # Привязываем обработчик
+    def show_history(self):
+        # Створюємо нове вікно для історії
+        history_window = Toplevel(self.root)
+        history_window.title("Історія знищених цілей")
+        history_window.geometry("500x400")
+        history_window.config(bg="#2F4F2F")
+        
+        # Заголовок
+        history_label = Label(history_window, text="Історія знищених цілей", font=("Stencil", 14, "bold"), bg="#2F4F2F", fg="white")
+        history_label.pack(pady=10)
 
-combo2 = ttk.Combobox(win, values=["Енеїда", "Тарас Бульба", "Гайдамаки", "Собор"])
-combo2.place(x=200, y=540)
-combo3 = ttk.Combobox(win, values=["Енеїда", "Тарас Бульба", "Гайдамаки", "Собор"])
-combo3.place(x=380, y=540)
-combo4 = ttk.Combobox(win, values=artillery_names)
-combo4.place(x=560, y=540)
-combo4.bind("<<ComboboxSelected>>", on_artillery_select)  # Привязываем обработчик
-combo5 = ttk.Combobox(win, values=caliber)
-combo5.place(x=740, y=540)
+        # Отримуємо знищені цілі
+        destroyed_targets = self.db.fetch_all("SELECT name, destroyed_time FROM targets WHERE destroyed = 1")
+        
+        # Виводимо кожну знищену ціль
+        history_list = Text(history_window, height=15, width=50, font=("Arial", 10), wrap=WORD, bg="#2F4F2F", fg="white")
+        history_list.pack(pady=10)
+        
+        for target in destroyed_targets:
+            history_list.insert(END, f"{target[0]} - {target[1]}\n")
+        
+        # Забороняємо редагувати текст
+        history_list.config(state=DISABLED)
 
-win.mainloop()
+    def load_position_units(self):
+        # Завантажуємо унікальні підрозділи
+        position_units = self.db.fetch_all("SELECT DISTINCT position_unit FROM position")
+        self.position_units = [row[0] for row in position_units]
+        self.combo_position_unit['values'] = self.position_units
+
+    def load_positions(self):
+        # Видаляємо всі мітки, щоб оновити
+        for _, marker in self.target_markers.values():
+            self.map_widget.delete(marker)
+
+        # Завантажуємо всі позиції
+        positions = self.db.fetch_all("SELECT name, latitude, longitude FROM position")
+        
+        for name, lat, lon in positions:
+            lat, lon = float(lat), float(lon)
+            marker = self.map_widget.set_marker(lat, lon, text=name)
+            self.target_markers[name] = (None, marker)
+
+        print("Усі позиції завантажено на карту!")
+
+
+    def update_position_options(self, event):
+        selected_unit = self.combo_position_unit.get()
+        positions_for_unit = self.db.fetch_all("SELECT name FROM position WHERE position_unit=?", (selected_unit,))
+        position_names = [row[0] for row in positions_for_unit]
+        self.combo_position['values'] = position_names
+        if position_names:
+            self.combo_position.current(0)
+
+    def restore_targets(self):
+        # Оновлення всіх цілей у базі даних
+        self.db.execute_query("UPDATE targets SET destroyed = 0")
+        
+        # Видаляємо всі мітки з карти
+        for _, marker in self.target_markers.values():
+            self.map_widget.delete(marker)
+
+        # Завантажуємо цілі заново
+        self.targets_data = self.db.fetch_all('SELECT * FROM targets')
+        self.load_targets()
+
+        print("Усі цілі відновлено!")
+
+    def load_targets(self):
+        # Видаляємо всі мітки для цілей
+        for _, marker in self.target_markers.values():
+            self.map_widget.delete(marker)
+
+        # Завантажуємо нові мітки для цілей
+        for row in self.targets_data:
+            target_id, field1, field2, field3, field4, destroyed = row
+            target_name = field1  # Використовуємо field1 як ім'я цілі
+            lat, lon = float(field3), float(field4)  # field3 - широта, field4 - довгота
+            
+            if destroyed:
+                marker = self.map_widget.set_marker(lat, lon, text=f"{target_name} (destroyed)")
+            else:
+                marker = self.map_widget.set_marker(lat, lon, text=target_name)
+
+            self.target_markers[target_name] = (target_id, marker)
+
+        print("Цілі завантажено на карту!")
+
+
+
+
+
+
+    def update_caliber(self, event):
+        selected_artillery = self.combo_artillery.get()
+        calibers = self.get_calibers_for_artillery(selected_artillery)
+        self.combo_caliber.set('')
+        self.combo_caliber['values'] = calibers
+        if calibers:
+            self.combo_caliber.current(0)
+
+    def attack(self):
+        target_name = self.entry_lat.get().strip()
+
+        if not target_name:
+            print("Некоректні дані")
+            return
+        
+        if target_name in self.target_markers:
+            target_id, marker = self.target_markers[target_name]
+            self.db.execute_query("UPDATE targets SET destroyed = 1 WHERE number = ?", (target_id,))
+            
+            lat, lon = marker.position
+            self.map_widget.delete(marker)
+            new_marker = self.map_widget.set_marker(lat, lon, text=f"{target_name} (destroyed)")
+            self.target_markers[target_name] = (target_id, new_marker)
+            print(f"Ціль {target_name} знищена.")
+        else:
+            print(f"Ціль {target_name} не знайдена в базі даних.")
+
+    def show_history(self):
+        # Створюємо нове вікно для історії
+        history_window = Toplevel(self.root)
+        history_window.title("Історія знищених цілей")
+        history_window.geometry("500x400")
+        history_window.config(bg="#2F4F2F")
+        
+        # Заголовок
+        history_label = Label(history_window, text="Історія знищених цілей", font=("Stencil", 14, "bold"), bg="#2F4F2F", fg="white")
+        history_label.pack(pady=10)
+
+        # Отримуємо знищені цілі
+        destroyed_targets = self.db.fetch_all("SELECT field1 FROM targets WHERE destroyed = 1")
+        
+        # Виводимо кожну знищену ціль
+        history_list = Text(history_window, height=15, width=50, font=("Arial", 10), wrap=WORD, bg="#2F4F2F", fg="white")
+        history_list.pack(pady=10)
+        
+        for target in destroyed_targets:
+            history_list.insert(END, f"{target[0]}\n")
+        
+        # Забороняємо редагувати текст
+        history_list.config(state=DISABLED)
+
+    def move_markers(self):
+        # Отримуємо всі позиції з новими координатами
+        positions_with_new_coords = self.db.fetch_all("SELECT name, lat_ch, long_ch FROM position")
+
+        for name, new_lat, new_lon in positions_with_new_coords:
+            # Перевіряємо, чи існує вже мітка для цієї позиції
+            if name in self.target_markers:
+                target_id, old_marker = self.target_markers[name]
+                lat, lon = float(new_lat), float(new_lon)  # Нові координати
+
+                # Оновлюємо мітку на карті
+                self.map_widget.delete(old_marker)
+                new_marker = self.map_widget.set_marker(lat, lon, text=name)
+                self.target_markers[name] = (target_id, new_marker)
+
+        print("Мітки були оновлені!")
+
+    def reset_markers(self):
+        # Видаляємо всі мітки з карти
+        for _, marker in self.target_markers.values():
+            self.map_widget.delete(marker)
+
+        # Отримуємо всі позиції з початковими координатами
+        positions_with_initial_coords = self.db.fetch_all("SELECT name, latitude, longitude FROM position")
+
+        # Додаємо мітки на нові координати
+        for name, lat, lon in positions_with_initial_coords:
+            lat, lon = float(lat), float(lon)
+            new_marker = self.map_widget.set_marker(lat, lon, text=name)
+            self.target_markers[name] = (None, new_marker)  # Не використовуємо target_id, якщо не потрібно
+
+        print("Мітки були відновлені на початкові позиції!")
+
+        # Завантажуємо мітки для цілей з таблиці "targets"
+        self.load_targets()  # Додаємо виклик для завантаження міток цілей
+
+
+
+
+
+
+if __name__ == "__main__":
+    root = Tk()
+    app = MilitaryApp(root)
+    root.mainloop()
